@@ -11,42 +11,27 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-// ✅ FIXED: Allow all Vercel + local during development
-const ALLOWED_ORIGINS = [
-  "http://localhost:5173",
-  "http://localhost:3000",
-  "https://fraudwatch-ai-v8um.vercel.app", // 🔥 YOUR CURRENT FRONTEND
-];
+// ✅ FINAL CORS FIX (simple + working)
+app.use(cors());
 
-// ✅ CORS CONFIG
-const corsOptions = {
-  origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // allow Postman/mobile
-    if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+// ✅ IMPORTANT: handle preflight
+app.options("*", cors());
 
-    // 🔥 TEMP FIX (allow all Vercel domains)
-    if (origin.includes("vercel.app")) return cb(null, true);
+// Middleware
+app.use(express.json());
 
-    return cb(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-};
-
+// Socket.io
 const io = new Server(server, {
   cors: {
-    origin: "*", // allow all for socket
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
 
-// Store io instance globally
+// Store io globally
 global.io = io;
 
-// Middleware
-app.use(cors(corsOptions));
-app.use(express.json());
-
-// Socket.io connection
+// Socket connection
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
   socket.on("disconnect", () => {
