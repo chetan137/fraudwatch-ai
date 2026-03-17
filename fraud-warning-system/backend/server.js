@@ -11,19 +11,22 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-const ALLOWED_ORIGINS = (
-  process.env.CLIENT_URLS ||
-  "http://localhost:5173,http://localhost:3000,https://frontend-snowy-psi-40.vercel.app"
-)
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+// ✅ FIXED: Allow all Vercel + local during development
+const ALLOWED_ORIGINS = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://fraudwatch-ai-v8um.vercel.app", // 🔥 YOUR CURRENT FRONTEND
+];
 
+// ✅ CORS CONFIG
 const corsOptions = {
   origin: (origin, cb) => {
-    // Allow requests with no origin (mobile, curl, Postman) or known origins
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    if (process.env.NODE_ENV !== "production") return cb(null, true);
+    if (!origin) return cb(null, true); // allow Postman/mobile
+    if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+
+    // 🔥 TEMP FIX (allow all Vercel domains)
+    if (origin.includes("vercel.app")) return cb(null, true);
+
     return cb(new Error("Not allowed by CORS"));
   },
   credentials: true,
@@ -31,7 +34,7 @@ const corsOptions = {
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.NODE_ENV === "production" ? ALLOWED_ORIGINS : "*",
+    origin: "*", // allow all for socket
     methods: ["GET", "POST"],
   },
 });
