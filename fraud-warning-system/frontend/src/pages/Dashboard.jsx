@@ -141,7 +141,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     const socket = io(SOCKET_URL, {
-      transports: ["websocket"],
+      transports: ["polling", "websocket"],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1500,
+      timeout: 8000,
+    });
+
+    socket.on("connect_error", () => {
+      // Keep dashboard usable via REST polling even if real-time channel is down.
     });
 
     socket.on("new_alert", ({ alert }) => {
