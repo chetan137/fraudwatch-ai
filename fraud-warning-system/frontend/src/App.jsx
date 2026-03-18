@@ -19,6 +19,7 @@ import Investigation from "./pages/Investigation.jsx";
 import Settings from "./pages/Settings.jsx";
 import LiveDemo from "./pages/LiveDemo.jsx";
 import EmployeePortal from "./pages/EmployeePortal.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import Topbar from "./components/Topbar.jsx";
 import Chatbot from "./components/Chatbot.jsx";
@@ -118,7 +119,7 @@ export default function App() {
             }}
           />
           <Routes>
-            <Route path="/" element={<Navigate to="/admin/login" replace />} />
+            <Route path="/" element={<LandingPage />} />
 
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
