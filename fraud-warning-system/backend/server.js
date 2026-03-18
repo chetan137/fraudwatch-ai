@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
@@ -5,23 +6,31 @@ const cors = require("cors");
 const app = express();
 const server = http.createServer(app);
 
-// ✅ IMPORTANT: allowed origin (NO slash)
-const allowedOrigin = "https://fraudwatch-ai-v8um.vercel.app";
-
-// ✅ GLOBAL CORS (must be FIRST)
-app.use(cors({
-  origin: allowedOrigin,
-  credentials: true
-}));
-
-// ✅ VERY IMPORTANT: handle ALL preflight requests manually
+// ✅ FIX: allow dynamic origins (Vercel + localhost)
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", allowedOrigin);
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  const origin = req.headers.origin;
 
+  if (
+    !origin ||
+    origin.includes("vercel.app") ||
+    origin.includes("localhost")
+  ) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+
+  // ✅ VERY IMPORTANT: handle preflight
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200); // 🔥 THIS FIXES YOUR ERROR
+    return res.sendStatus(200);
   }
 
   next();
@@ -30,7 +39,7 @@ app.use((req, res, next) => {
 // ✅ Body parser
 app.use(express.json());
 
-// ✅ TEST ROUTE (check if server works)
+// ✅ Test route
 app.get("/", (req, res) => {
   res.send("Backend working");
 });
@@ -42,6 +51,7 @@ app.use("/api/alerts", require("./routes/alertRoutes"));
 app.use("/api/ml", require("./routes/mlRoutes"));
 
 // ✅ Start server
-server.listen(5000, () => {
-  console.log("Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
