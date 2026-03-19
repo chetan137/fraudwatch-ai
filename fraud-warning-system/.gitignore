@@ -6,3 +6,10 @@ dist/
 .vite/
 frontend/node_modules/
 backend/node_modules/
+
+# Python / ML service (local venv & trained artifacts)
+ml-service/.venv/
+ml-service/__pycache__/
+ml-service/*.pyc
+ml-service/fraud_model.pkl
+ml-service/scaler.pkl

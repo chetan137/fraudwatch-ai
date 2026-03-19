@@ -59,7 +59,25 @@ npm run seed:dummy
 
 You should see: `Seeded 5 alerts/activities` and a list of names.
 
-## 4. Start the backend
+## 4. Start the ML service (required for real fraud scores)
+
+The backend calls the Python service on **port 5001** by default (`ML_SERVICE_URL` in `backend/.env`).
+
+```bash
+cd fraud-warning-system/ml-service
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+```
+
+You should see: `ML model ready!` and the server listening on port 5001.
+
+**Check:** `curl http://localhost:5001/health` → JSON with `"status":"OK"`.
+
+If the ML service is down, activities still save but the backend uses **fallback** scoring (different from the model), so high amounts like ₹25,000 may not cross the alert threshold.
+
+## 5. Start the backend
 
 ```bash
 cd fraud-warning-system/backend
@@ -70,7 +88,9 @@ npm start
 
 You should see: `MongoDB Connected: ...`
 
-## 5. Start the frontend
+Ensure `ML_SERVICE_URL=http://localhost:5001` in `backend/.env` matches where the ML service runs.
+
+## 6. Start the frontend
 
 ```bash
 cd fraud-warning-system/frontend
@@ -80,7 +100,7 @@ npm run dev
 
 Open the app (e.g. http://localhost:5173).
 
-## 6. Log in
+## 7. Log in
 
 Live data is only shown when you are **logged in**. Use a demo account:
 

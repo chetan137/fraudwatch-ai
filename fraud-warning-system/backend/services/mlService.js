@@ -1,11 +1,17 @@
 const axios = require("axios");
 
-const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:5001";
+// Flask ML service exposes POST /analyze (not /predict). Trim trailing slashes
+// so we don't build URLs like https://host.onrender.com//analyze.
+const ML_BASE_URL = (process.env.ML_SERVICE_URL || "http://localhost:5001").replace(
+  /\/+$/,
+  "",
+);
 
 const analyzeActivity = async (activity) => {
   try {
-    const response = await axios.post(`${ML_SERVICE_URL}/predict  `, activity, {
-      timeout: 5000,
+    const response = await axios.post(`${ML_BASE_URL}/analyze`, activity, {
+      // Render free tier can cold-start; allow time for the ML service to wake up
+      timeout: Number(process.env.ML_SERVICE_TIMEOUT_MS || 15000),
     });
     const data = response.data || {};
     if (

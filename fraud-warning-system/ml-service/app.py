@@ -18,8 +18,7 @@ def health():
     return jsonify({'status': 'OK', 'message': 'Fraud Detection ML Service Running'})
 
 
-@app.route('/analyze', methods=['POST'])
-def analyze():
+def _handle_predict():
     try:
         activity = request.get_json()
         if not activity:
@@ -31,6 +30,17 @@ def analyze():
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/analyze', methods=['POST'])
+def analyze():
+    return _handle_predict()
+
+
+# Backward-compatible alias (older clients used /predict)
+@app.route('/predict', methods=['POST'])
+def predict_route():
+    return _handle_predict()
 
 
 @app.route('/retrain', methods=['POST'])

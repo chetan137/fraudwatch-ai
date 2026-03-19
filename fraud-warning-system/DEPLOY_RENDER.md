@@ -56,5 +56,7 @@ npm run bootstrap:employees
 ## Notes
 
 - Frontend uses `VITE_API_URL` and `VITE_SOCKET_URL` (set by blueprint).
-- Backend uses `ML_SERVICE_URL` and `CLIENT_URLS` (set by blueprint).
+- Backend uses `ML_SERVICE_URL` and `CLIENT_URLS` (set by blueprint). The backend must call **`POST {ML_SERVICE_URL}/analyze`** (Flask route). If you see fallback alerts (“ML service unavailable”), check ML logs and increase `ML_SERVICE_TIMEOUT_MS` on the backend if the ML service cold-starts slowly.
 - ML service reads Render `PORT` automatically.
+
+After updating the backend code, **redeploy `fraudwatch-backend`** on Render so the fixed ML client is live.
