@@ -4,7 +4,7 @@ const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:5001";
 
 const analyzeActivity = async (activity) => {
   try {
-    const response = await axios.post(`${ML_SERVICE_URL}/analyze`, activity, {
+    const response = await axios.post(`${ML_SERVICE_URL}/predict  `, activity, {
       timeout: 5000,
     });
     const data = response.data || {};
